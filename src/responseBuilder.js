@@ -51,6 +51,14 @@ const getRequestType = event => {
   }
 }
 
+const getPowerValue = event => {
+  if (isPowerControlRequest(event)) {
+    const requestType = getRequestType(event)
+    return requestType.replace('Turn', '').toUpperCase()
+  }
+  return undefined
+}
+
 const isPowerControlRequest = event => {
   const requestType = getRequestType(event)
   const { TURN_ON, TURN_OFF } = REQUEST_TYPES
@@ -140,7 +148,7 @@ const buildResponseToEvent = event => {
         break
       case REQUEST_TYPES.TURN_ON:
       case REQUEST_TYPES.TURN_OFF:
-        const value = requestType.replace('Turn', '').toUpperCase()
+        const value = getPowerValue(event)
         response = buildControlResponse(event, value)
         break
       case REQUEST_TYPES.UNKNOWN:
@@ -158,9 +166,11 @@ const buildResponseToEvent = event => {
 
 module.exports = {
   getRequestType,
+  getPowerValue,
   isPowerControlRequest,
   buildResponseToEvent,
   buildErrorResponse,
   buildControlResponse,
-  buildDiscoveryResponse
+  buildDiscoveryResponse,
+  ERROR_TYPES
 }

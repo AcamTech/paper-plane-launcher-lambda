@@ -6,6 +6,7 @@ const responses = require('./responses.json')
 
 const {
   getRequestType,
+  getPowerValue,
   isPowerControlRequest,
   buildDiscoveryResponse,
   buildErrorResponse,
@@ -26,6 +27,22 @@ describe('getRequestType', () => {
     const expected = 'Unknown'
     const actual = getRequestType(event)
     expect(actual).toBe(expected)
+  })
+})
+
+describe('getPowerValue', () => {
+  test('gets ON/OFF', () => {
+    let actual = getPowerValue(events.turnOn)
+    let expected = 'ON'
+    expect(actual).toBe(expected)
+    actual = getPowerValue(events.turnOff)
+    expected = 'OFF'
+    expect(actual).toBe(expected)
+  })
+
+  test('gets undefined for non-power-control requests', () => {
+    const actual = getPowerValue(events.discover)
+    expect(actual).toBeUndefined()
   })
 })
 
