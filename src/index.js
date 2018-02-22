@@ -8,8 +8,6 @@ const REQUEST_TYPES = Object.freeze({
 
 const RESPONSE_TYPES = Object.freeze({
   DISCOVER: "Discover.Response",
-  TURN_ON: "ON",
-  TURN_OFF: "OFF",
   ERROR: "ErrorResponse"
 })
 
@@ -44,6 +42,14 @@ const BASE_ENDPOINT = Object.freeze({
   "displayCategories": ["SWITCH"],
   capabilities: CAPABILITIES
 })
+
+const getRequestType = event => {
+  try {
+    return event.directive.header.name
+  } catch (error) {
+    return REQUEST_TYPES.UNKNOWN
+  }
+}
 
 // Expected response https://developer.amazon.com/docs/device-apis/alexa-errorresponse.html
 const buildErrorResponse = (event, type, error) => ({
@@ -91,16 +97,8 @@ const buildControlResponse = (event, value) => {
   return response
 }
 
-const getRequestType = event => {
-  try {
-    return event.directive.header.name
-  } catch (error) {
-    return REQUEST_TYPES.UNKNOWN
-  }
-}
-
 // Expected response https://developer.amazon.com/docs/device-apis/alexa-discovery.html#discoverresponse
-const handleAlexaDiscoverRequest = event => {
+const buildDiscoveryResponse = event => {
   // Use the messageId as an identifier of the device/thing/launcher
   const endpointId = event.directive.header.messageId
   const endpoint = Object.assign({ endpointId }, BASE_ENDPOINT)
@@ -110,34 +108,48 @@ const handleAlexaDiscoverRequest = event => {
   return { event: { header, payload } }
 }
 
-const getResponseToEvent = event => {
+const buildResponseToEvent = event => {
   let response
   try {
     const requestType = getRequestType(event)
     switch (requestType) {
       case REQUEST_TYPES.DISCOVER:
-        response = handleAlexaDiscoverRequest(event)
-        break;
+        response = buildDiscoveryResponse(event)
+        break
+      case REQUEST_TYPES.REPORT_STATE:
+        // Say it's off everytime Alexa asks.
+        // We can query the launcher later to give a real state
+        // Problably we should say "retrievable: false" in the discovery response
+        response = buildControlResponse(event, 'OFF')
+        break
+      case REQUEST_TYPES.TURN_ON:
+      case REQUEST_TYPES.TURN_OFF:
+        const value = requestType.replace('Turn', '').toUpperCase()
+        response = buildControlResponse(event, value)
+        break
       case REQUEST_TYPES.UNKNOWN:
       default:
         const error = new Error('Directive is not valid for this skill or is malformed')
         response = buildErrorResponse(event, ERROR_TYPES.INVALID_DIRECTIVE, error)
     }
   } catch (error) {
-    // Succeed to lambda but tell alexa we failed
+    console.error(error);
+    // Succeed to lambda but tell alexa that we failed
     response = buildErrorResponse(event, ERROR_TYPES.INTERNAL_ERROR, error)
   }
   return response
 }
 
 const handler = (event, context) => {
-  const response = getResponseToEvent(event)
+  const response = buildResponseToEvent(event)
   context.succeed(response)
 }
 
-exports.getRequestType = getRequestType
-exports.getResponseToEvent = getResponseToEvent
-exports.buildErrorResponse = buildErrorResponse
-exports.buildControlResponse = buildControlResponse
-exports.handleAlexaDiscoverRequest = handleAlexaDiscoverRequest
-exports.handler = handler
+module.exports = {
+  getRequestType,
+  buildResponseToEvent,
+  buildErrorResponse,
+  buildControlResponse,
+  buildDiscoveryResponse,
+  handler
+}

@@ -6,9 +6,10 @@ const responses = require('./responses.json')
 
 const {
   getRequestType,
-  handleAlexaDiscoverRequest,
+  buildDiscoveryResponse,
   buildErrorResponse,
-  buildControlResponse
+  buildControlResponse,
+  buildResponseToEvent
 } = lambda
 
 describe('getRequestType', () => {
@@ -27,9 +28,9 @@ describe('getRequestType', () => {
   })
 })
 
-describe('handleAlexaDiscoverRequest', () => {
+describe('buildDiscoveryResponse', () => {
   const event = events.discover
-  const response = handleAlexaDiscoverRequest(event)
+  const response = buildDiscoveryResponse(event)
 
   test('event.header.name to be "Discover.Response"', () => {
     const expected = 'Discover.Response'
@@ -123,5 +124,53 @@ describe('buildControlResponse', () => {
     actual = healthProperty.value.value
     expected = 'OK'
     expect(actual).toBe(expected)
+  })
+})
+
+describe('buildResponseToEvent', () => {
+  test('calls buildDiscoveryResponse', () => {
+    const event = events.discover
+    const actual = buildResponseToEvent(event)
+    const expected = buildDiscoveryResponse(event)
+    expect(actual).toEqual(expected)
+  })
+
+  test('builds a controlResponse to a reportState request', () => {
+    // I couldn't get jest.spyOn(lambda, 'buildControlResponse') to work
+    // so I had to test it manually
+    const event = events.reportState
+    const actualResponse = buildResponseToEvent(event)
+    const actualProperty = actualResponse.context.properties.find(({name}) => name == 'powerState')
+    const actual = actualProperty.value
+    const expectedResponse = buildControlResponse(event, 'OFF')
+    const expectedProperty = expectedResponse.context.properties.find(({name}) => name == 'powerState')
+    const expected = expectedProperty.value
+    expect(actual).toEqual(expected)
+  })
+
+  test('builds controlResponse to turnOn request', () => {
+    // I couldn't get jest.spyOn(lambda, 'buildControlResponse') to work
+    // so I had to test it manually
+    const event = events.turnOn
+    const actualResponse = buildResponseToEvent(event)
+    const actualProperty = actualResponse.context.properties.find(({name}) => name == 'powerState')
+    const actual = actualProperty.value
+    const expectedResponse = buildControlResponse(event, 'ON')
+    const expectedProperty = expectedResponse.context.properties.find(({name}) => name == 'powerState')
+    const expected = expectedProperty.value
+    expect(actual).toEqual(expected)
+  })
+
+  test('builds controlResponse to turnOff request', () => {
+    // I couldn't get jest.spyOn(lambda, 'buildControlResponse') to work
+    // so I had to test it manually
+    const event = events.turnOff
+    const actualResponse = buildResponseToEvent(event)
+    const actualProperty = actualResponse.context.properties.find(({name}) => name == 'powerState')
+    const actual = actualProperty.value
+    const expectedResponse = buildControlResponse(event, 'OFF')
+    const expectedProperty = expectedResponse.context.properties.find(({name}) => name == 'powerState')
+    const expected = expectedProperty.value
+    expect(actual).toEqual(expected)
   })
 })
