@@ -54,5 +54,44 @@
       },
       "payload": {}
     }
+  },
+  "discover": {
+    "event": {
+      "header": {
+        "namespace": "Alexa.Discovery",
+        "name": "Discover.Response",
+        "payloadVersion": "3",
+        "messageId": "5f8a426e-01e4-4cc9-8b79-65f8bd0fd8a4"
+      },
+      "payload": {
+        "endpoints": [
+          {
+            "endpointId": "appliance-001",
+            "manufacturerName": "Sample Manufacturer",
+            "friendlyName": "Living Room Switch",
+            "description": "Smart Switch by Sample Manufacturer",
+            "displayCategories": ["SWITCH"],
+            "capabilities": [
+              {
+                "type": "AlexaInterface",
+                "interface": "Alexa",
+                "version": "3"
+              },
+              {
+                "interface": "Alexa.PowerController",
+                "version": "3",
+                "type": "AlexaInterface",
+                "properties": {
+                  "supported": [{
+                    "name": "powerState"
+                  }],
+                   "retrievable": true
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
   }
 }
