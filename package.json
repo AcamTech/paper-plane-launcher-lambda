@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jonathanmv/paper-plane-launcher.git"
+    "url": "git+https://github.com/jonathanmv/paper-plane-launcher-lambda.git"
   },
   "keywords": [
     "AWS",
@@ -29,9 +29,9 @@
   "author": "Jonathan Morales Vélez",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jonathanmv/paper-plane-launcher/issues"
+    "url": "https://github.com/jonathanmv/paper-plane-launcher-lambda/issues"
   },
-  "homepage": "https://github.com/jonathanmv/paper-plane-launcher#readme",
+  "homepage": "https://github.com/jonathanmv/paper-plane-launcher-lambda#readme",
   "dependencies": {
     "mqtt": "2.15.3"
   }
