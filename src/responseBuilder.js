@@ -51,6 +51,12 @@ const getRequestType = event => {
   }
 }
 
+const isPowerControlRequest = event => {
+  const requestType = getRequestType(event)
+  const { TURN_ON, TURN_OFF } = REQUEST_TYPES
+  return [TURN_ON, TURN_OFF].includes(requestType)
+}
+
 // Expected response https://developer.amazon.com/docs/device-apis/alexa-errorresponse.html
 const buildErrorResponse = (event, type, error) => {
   const requestType = getRequestType(event)
@@ -152,6 +158,7 @@ const buildResponseToEvent = event => {
 
 module.exports = {
   getRequestType,
+  isPowerControlRequest,
   buildResponseToEvent,
   buildErrorResponse,
   buildControlResponse,
