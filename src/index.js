@@ -9,7 +9,13 @@ const REQUEST_TYPES = Object.freeze({
 const RESPONSE_TYPES = Object.freeze({
   DISCOVER: "Discover.Response",
   TURN_ON: "ON",
-  TURN_OFF: "OFF"
+  TURN_OFF: "OFF",
+  ERROR: "ErrorResponse"
+})
+
+const ERROR_TYPES = Object.freeze({
+  INTERNAL_ERROR: "INTERNAL_ERROR",
+  INVALID_DIRECTIVE: "INVALID_DIRECTIVE"
 })
 
 const CAPABILITIES = Object.freeze([
@@ -39,6 +45,18 @@ const BASE_ENDPOINT = Object.freeze({
   capabilities: CAPABILITIES
 })
 
+// Expected response https://developer.amazon.com/docs/device-apis/alexa-errorresponse.html
+const buildErrorResponse = (event, type, error) => ({
+  event: {
+    header: Object.assign({}, event.directive.header, { name: RESPONSE_TYPES.ERROR }),
+    endpoint: { endpointId: event.directive.header.messageId },
+    payload: {
+      type,
+      message: error.message
+    }
+  }
+})
+
 const getRequestType = event => {
   try {
     return event.directive.header.name
@@ -58,12 +76,33 @@ const handleAlexaDiscoverRequest = event => {
   return { event: { header, payload } }
 }
 
-const handler = (event, context) => {
-  
+const getResponseToEvent = event => {
+  let response
+  try {
+    const requestType = getRequestType(event)
+    switch (requestType) {
+      case REQUEST_TYPES.DISCOVER:
+        response = handleAlexaDiscoverRequest(event)
+        break;
+      case REQUEST_TYPES.UNKNOWN:
+      default:
+        const error = new Error('Directive is not valid for this skill or is malformed')
+        response = buildErrorResponse(event, ERROR_TYPES.INVALID_DIRECTIVE, error)
+    }
+  } catch (error) {
+    // Succeed to lambda but tell alexa we failed
+    response = buildErrorResponse(event, ERROR_TYPES.INTERNAL_ERROR, error)
+  }
+  return response
 }
 
+const handler = (event, context) => {
+  const response = getResponseToEvent(event)
+  context.succeed(response)
+}
 
-exports.REQUEST_TYPES = REQUEST_TYPES
 exports.getRequestType = getRequestType
+exports.getResponseToEvent = getResponseToEvent
+exports.buildErrorResponse = buildErrorResponse
 exports.handleAlexaDiscoverRequest = handleAlexaDiscoverRequest
 exports.handler = handler

@@ -93,5 +93,23 @@
         ]
       }
     }
+  },
+  "error": {
+    "event": {
+      "header": {
+        "namespace": "Alexa",
+        "name": "ErrorResponse",
+        "messageId": "a9a87be3-a41a-43c4-b734-04a8fcaf9d3c",
+        "correlationToken": "dFMb0z+PgpgdDmluhJ1LddFvSqZ/jCc8ptlAKulUj90jSqg==",
+        "payloadVersion": "3"
+      },
+      "endpoint":{
+        "endpointId":"appliance-001"
+      },
+      "payload": {
+        "type": "ENDPOINT_UNREACHABLE",
+        "message": "Unable to reach endpoint 12345 because it appears to be offline"
+      }
+    }
   }
 }

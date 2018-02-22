@@ -5,27 +5,22 @@ const events = require('./events.json')
 const responses = require('./responses.json')
 
 const {
-  REQUEST_TYPES,
   getRequestType,
-  handleAlexaDiscoverRequest
+  handleAlexaDiscoverRequest,
+  buildErrorResponse
 } = lambda
-
-const {
-  UNKNOWN,
-  TURN_ON
-} = REQUEST_TYPES
 
 describe('getRequestType', () => {
   test('finds the alexa request type', () => {
     const event = events.turnOn
-    const expected = TURN_ON
+    const expected = 'TurnOn'
     const actual = getRequestType(event)
     expect(actual).toBe(expected)
   })
 
   test('returns unknown request type', () => {
     const event = {}
-    const expected = UNKNOWN
+    const expected = 'Unknown'
     const actual = getRequestType(event)
     expect(actual).toBe(expected)
   })
@@ -61,5 +56,34 @@ describe('handleAlexaDiscoverRequest', () => {
       const expected = ['Alexa', 'Alexa.PowerController'].sort()
       expect(actual).toEqual(expected)
     })
+  })
+})
+
+describe('buildErrorResponse', () => {
+  const event = events.discover
+  const type = 'MyType'
+  const error = new Error('Error message')
+  const response = buildErrorResponse(event, type, error)
+  const { header, endpoint, payload } = response.event
+
+  test('header.name to be "ErrorResponse"', () => {
+    const expected = 'ErrorResponse'
+    const actual = header.name
+    expect(actual).toBe(expected)
+  })
+
+  test('endpointId to be messageId', () => {
+    const expected = event.directive.header.messageId
+    const actual = endpoint.endpointId
+    expect(actual).toBe(expected)
+  })
+
+  test('payload.type to be "MyType" and payload.message to be error.message', () => {
+    let expected = type
+    let actual = payload.type
+    expect(actual).toBe(expected)
+    expected = error.message
+    actual = payload.message
+    expect(actual).toBe(expected)
   })
 })
