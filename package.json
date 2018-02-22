@@ -4,7 +4,12 @@
   "description": "Aws Lambda code to handle alexa requests and control an arduino-based paper plane launcher",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "clean": "rm -rf build build.zip;",
+    "zip": "mkdir build; cp -fr src/* node_modules build && zip -rq build.zip build/*",
+    "build": "npm run clean; npm run zip",
+    "update-lambda": "aws lambda update-function-code --function-name arduino-alexa --zip-file fileb://build.zip --publish",
+    "deploy": "npm run build && npm run update-lambda"
   },
   "repository": {
     "type": "git",
@@ -26,5 +31,8 @@
   "bugs": {
     "url": "https://github.com/jonathanmv/paper-plane-launcher/issues"
   },
-  "homepage": "https://github.com/jonathanmv/paper-plane-launcher#readme"
+  "homepage": "https://github.com/jonathanmv/paper-plane-launcher#readme",
+  "dependencies": {
+    "mqtt": "2.15.3"
+  }
 }
