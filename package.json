@@ -1,0 +1,30 @@
+{
+  "name": "paper-plane-launcher-lambda",
+  "version": "1.0.0",
+  "description": "Aws Lambda code to handle alexa requests and control an arduino-based paper plane launcher",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathanmv/paper-plane-launcher.git"
+  },
+  "keywords": [
+    "AWS",
+    "Lambda",
+    "Amazon",
+    "Alexa",
+    "MQTT",
+    "Alexa",
+    "Smart",
+    "Home",
+    "Skill"
+  ],
+  "author": "Jonathan Morales Vélez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonathanmv/paper-plane-launcher/issues"
+  },
+  "homepage": "https://github.com/jonathanmv/paper-plane-launcher#readme"
+}
