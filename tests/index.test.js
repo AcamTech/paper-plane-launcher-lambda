@@ -66,9 +66,12 @@ describe('buildErrorResponse', () => {
   const response = buildErrorResponse(event, type, error)
   const { header, endpoint, payload } = response.event
 
-  test('header.name to be "ErrorResponse"', () => {
-    const expected = 'ErrorResponse'
-    const actual = header.name
+  test('header.namespace to be "Alexa" and header.name to be "ErrorResponse"', () => {
+    let expected = 'ErrorResponse'
+    let actual = header.name
+    expect(actual).toBe(expected)
+    expected = 'Alexa'
+    actual = header.namespace
     expect(actual).toBe(expected)
   })
 

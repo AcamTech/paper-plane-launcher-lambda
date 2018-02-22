@@ -48,7 +48,7 @@ const BASE_ENDPOINT = Object.freeze({
 // Expected response https://developer.amazon.com/docs/device-apis/alexa-errorresponse.html
 const buildErrorResponse = (event, type, error) => ({
   event: {
-    header: Object.assign({}, event.directive.header, { name: RESPONSE_TYPES.ERROR }),
+    header: Object.assign({}, event.directive.header, { name: RESPONSE_TYPES.ERROR, namespace: 'Alexa' }),
     endpoint: { endpointId: event.directive.header.messageId },
     payload: {
       type,
