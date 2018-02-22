@@ -1,4 +1,4 @@
-const lambda = require('../src/index')
+const responseBuilder = require('../src/responseBuilder')
 
 // Found in https://developer.amazon.com/docs/device-apis/alexa-powercontroller.html
 const events = require('./events.json')
@@ -10,7 +10,7 @@ const {
   buildErrorResponse,
   buildControlResponse,
   buildResponseToEvent
-} = lambda
+} = responseBuilder
 
 describe('getRequestType', () => {
   test('finds the alexa request type', () => {
@@ -144,7 +144,7 @@ describe('buildResponseToEvent', () => {
   })
 
   test('builds a controlResponse to a reportState request', () => {
-    // I couldn't get jest.spyOn(lambda, 'buildControlResponse') to work
+    // I couldn't get jest.spyOn(responseBuilder, 'buildControlResponse') to work
     // so I had to test it manually
     const event = events.reportState
     const actualResponse = buildResponseToEvent(event)
@@ -157,7 +157,7 @@ describe('buildResponseToEvent', () => {
   })
 
   test('builds controlResponse to turnOn request', () => {
-    // I couldn't get jest.spyOn(lambda, 'buildControlResponse') to work
+    // I couldn't get jest.spyOn(responseBuilder, 'buildControlResponse') to work
     // so I had to test it manually
     const event = events.turnOn
     const actualResponse = buildResponseToEvent(event)
@@ -170,7 +170,7 @@ describe('buildResponseToEvent', () => {
   })
 
   test('builds controlResponse to turnOff request', () => {
-    // I couldn't get jest.spyOn(lambda, 'buildControlResponse') to work
+    // I couldn't get jest.spyOn(responseBuilder, 'buildControlResponse') to work
     // so I had to test it manually
     const event = events.turnOff
     const actualResponse = buildResponseToEvent(event)
