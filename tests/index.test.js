@@ -64,7 +64,8 @@ describe('buildDiscoveryResponse', () => {
 describe('buildErrorResponse', () => {
   const event = events.discover
   const type = 'MyType'
-  const error = new Error('Error message')
+  const message = 'Error message'
+  const error = new Error(message)
   const response = buildErrorResponse(event, type, error)
   const { header, endpoint, payload } = response.event
 
@@ -90,6 +91,13 @@ describe('buildErrorResponse', () => {
     expected = error.message
     actual = payload.message
     expect(actual).toBe(expected)
+  })
+
+  test('handles non-alexa-event', () => {
+    const event = {}
+    const actual = buildErrorResponse(event, type, error)
+    const expected = { event: { header: {}, endpoint: {}, payload: { type, message } } }
+    expect(actual).toEqual(expected)
   })
 })
 

@@ -52,16 +52,26 @@ const getRequestType = event => {
 }
 
 // Expected response https://developer.amazon.com/docs/device-apis/alexa-errorresponse.html
-const buildErrorResponse = (event, type, error) => ({
-  event: {
-    header: Object.assign({}, event.directive.header, { name: RESPONSE_TYPES.ERROR, namespace: 'Alexa' }),
-    endpoint: { endpointId: event.directive.header.messageId },
-    payload: {
-      type,
-      message: error.message
+const buildErrorResponse = (event, type, error) => {
+  const requestType = getRequestType(event)
+  let response = {
+    event: { header: {}, endpoint: {}, payload: { type, message: error.message } }
+  }
+  if (requestType != REQUEST_TYPES.UNKNOWN) {
+    response = {
+      event: {
+        header: Object.assign({}, event.directive.header, { name: RESPONSE_TYPES.ERROR, namespace: 'Alexa' }),
+        endpoint: { endpointId: event.directive.header.messageId },
+        payload: {
+          type,
+          message: error.message
+        }
+      }
     }
   }
-})
+
+  return response
+}
 
 // Expected response https://developer.amazon.com/docs/device-apis/alexa-powercontroller.html
 const buildControlResponse = (event, value) => {
