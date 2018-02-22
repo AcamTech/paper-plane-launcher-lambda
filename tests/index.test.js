@@ -7,7 +7,8 @@ const responses = require('./responses.json')
 const {
   getRequestType,
   handleAlexaDiscoverRequest,
-  buildErrorResponse
+  buildErrorResponse,
+  buildControlResponse
 } = lambda
 
 describe('getRequestType', () => {
@@ -87,6 +88,40 @@ describe('buildErrorResponse', () => {
     expect(actual).toBe(expected)
     expected = error.message
     actual = payload.message
+    expect(actual).toBe(expected)
+  })
+})
+
+describe('buildControlResponse', () => {
+  const event = events.turnOn
+  const value = 'turnOn'
+  const response = buildControlResponse(event, value)
+  const { header, endpoint, payload } = response.event
+  const { properties } = response.context
+
+  test('header.namespace to be "Alexa" and header.name to be "Response"', () => {
+    let expected = 'Response'
+    let actual = header.name
+    expect(actual).toBe(expected)
+    expected = 'Alexa'
+    actual = header.namespace
+    expect(actual).toBe(expected)
+  })
+
+  test('response.endpoint to be directive.endpoint', () => {
+    const expected = event.directive.endpoint
+    const actual = endpoint
+    expect(actual).toEqual(expected)
+  })
+
+  test('context.properties contains powerState and connectivity properties', () => {
+    const powerProperty = properties.find(({ namespace }) => namespace == 'Alexa.PowerController')
+    const healthProperty = properties.find(({ namespace }) => namespace == 'Alexa.EndpointHealth')
+    let actual = powerProperty.value
+    let expected = value
+    expect(actual).toBe(expected)
+    actual = healthProperty.value.value
+    expected = 'OK'
     expect(actual).toBe(expected)
   })
 })

@@ -57,6 +57,40 @@ const buildErrorResponse = (event, type, error) => ({
   }
 })
 
+// Expected response https://developer.amazon.com/docs/device-apis/alexa-powercontroller.html
+const buildControlResponse = (event, value) => {
+  const timeOfSample = new Date().toISOString()
+  const uncertaintyInMilliseconds = 500
+  const response = {
+    "event": {
+      "header": Object.assign({}, event.directive.header, { namespace: 'Alexa', name: 'Response' }),
+      "endpoint": event.directive.endpoint,
+      "payload": {}
+    },
+    "context": {
+      "properties": [
+        {
+          "namespace": "Alexa.PowerController",
+          "name": "powerState",
+          value,
+          timeOfSample,
+          uncertaintyInMilliseconds
+        },
+        {
+          "namespace": "Alexa.EndpointHealth",
+          "name": "connectivity",
+          "value": {
+            "value": "OK"
+          },
+          timeOfSample,
+          uncertaintyInMilliseconds
+        }
+      ]
+    }
+  }
+  return response
+}
+
 const getRequestType = event => {
   try {
     return event.directive.header.name
@@ -104,5 +138,6 @@ const handler = (event, context) => {
 exports.getRequestType = getRequestType
 exports.getResponseToEvent = getResponseToEvent
 exports.buildErrorResponse = buildErrorResponse
+exports.buildControlResponse = buildControlResponse
 exports.handleAlexaDiscoverRequest = handleAlexaDiscoverRequest
 exports.handler = handler
